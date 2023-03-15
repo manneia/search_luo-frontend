@@ -1,10 +1,31 @@
 <template>
-  <div>文章列表</div>
-  <img :src="gege" alt="err" />
+  <a-list item-layout="horizontal" :data-source="props.postList">
+    <template #renderItem="{ item }">
+      <a-list-item>
+        <a-list-item-meta :description="item.content">
+          <template #title>
+            <a href="https://www.antdv.com/">{{ item.title }}</a>
+          </template>
+          <template #avatar>
+            <a-avatar class="gege" :src="item.url" />
+          </template>
+        </a-list-item-meta>
+      </a-list-item>
+    </template>
+  </a-list>
 </template>
 <script setup lang="ts">
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import gege from "../assets/gege.jpg";
+import { withDefaults, defineProps } from "vue";
+interface Props {
+  postList: any[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  postList: () => [],
+});
 </script>
-<style scoped></style>
+<style scoped>
+.gege {
+  width: 200px;
+}
+</style>
