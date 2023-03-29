@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <a-input-search
-      v-model:value="searchParams.text"
+      v-model:value="searchText"
       placeholder="请输入搜索关键词"
       enter-button="Search"
       size="large"
@@ -30,14 +30,18 @@ import UserList from "@/components/UserList.vue";
 import MyDivider from "@/components/MyDivider.vue";
 import { useRoute, useRouter } from "vue-router";
 import MyAxios from "@/plugins/MyAxios";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import _ from "lodash";
 
 const router = useRouter();
 const route = useRoute();
 const postList = ref([]);
 const userList = ref([]);
 const pictureList = ref([]);
-const activeKey = route.query.category;
+const activeKey = route.params.category;
+const searchText = ref(route.query.text || "");
 const initSearchParams = {
+  type: activeKey,
   text: "",
   pageSize: 10,
   pageNum: 1,
@@ -47,6 +51,7 @@ const initSearchParams = {
  * 加载数据
  * @param params 搜索参数
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const loadDataOld = (params: any) => {
   const postQuery = {
     ...params,
@@ -76,6 +81,32 @@ const loadDataOld = (params: any) => {
  * @param params 搜索参数
  */
 const loadData = (params: any) => {
+  const { type } = params;
+  // if (!type) {
+  //   message.error("类别为空");
+  //   return;
+  // }
+  const query = {
+    ...params,
+    searchText: params.text,
+  };
+  MyAxios.post("search/all", query).then((res: any) => {
+    if (type === "post") {
+      postList.value = res?.dataList;
+    } else if (type === "user") {
+      userList.value = res?.dataList;
+    } else if (type === "picture") {
+      pictureList.value = res?.dataList;
+    }
+  });
+};
+
+/**
+ * 加载单类数据
+ * @param params 搜索参数
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const loadAllData = (params: any) => {
   const query = {
     ...params,
     searchText: params.text,
@@ -95,15 +126,17 @@ watchEffect(() => {
   searchParams.value = {
     ...initSearchParams,
     text: route.query.text as string,
-  } as never;
-  // loadData(searchParams.value);
+    type: route.params.category,
+  } as any;
+  _.debounce(loadData(searchParams.value), 1000);
 });
 const onSearch = (value: string) => {
-  console.log(value);
   router.push({
-    query: searchParams.value,
+    query: {
+      ...searchParams.value,
+      text: value,
+    },
   });
-  loadData(searchParams.value);
 };
 const onTabChange = (key: string) => {
   router.push({
