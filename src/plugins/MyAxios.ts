@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const MyAxios = axios.create({
-  baseURL: "http://localhost:8102/api",
+  baseURL:
+    process.env.NODE_ENV === "production"
+      ? process.env.VUE_APP_BASE_API
+      : process.env.VUE_APP_BASE_API,
   timeout: 10000,
 });
 

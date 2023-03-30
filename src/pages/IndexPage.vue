@@ -31,7 +31,6 @@ import MyDivider from "@/components/MyDivider.vue";
 import { useRoute, useRouter } from "vue-router";
 import MyAxios from "@/plugins/MyAxios";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import _ from "lodash";
 
 const router = useRouter();
 const route = useRoute();
@@ -128,7 +127,7 @@ watchEffect(() => {
     text: route.query.text as string,
     type: route.params.category,
   } as any;
-  _.debounce(loadData(searchParams.value), 1000);
+  loadData(searchParams.value);
 });
 const onSearch = (value: string) => {
   router.push({
